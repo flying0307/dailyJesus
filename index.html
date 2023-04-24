@@ -4,15 +4,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>每日靈糧最新影片連結清單</title>
+    <title>每日靈糧最新影片</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
 </head>
 
 <body>
-    <h1>每日靈糧最新影片連結清單</h1>
+    <h1>每日靈糧最新影片</h1>
     <ul id="videoList"></ul>
     <script>
-        const apiKey = 'AIzaSyCOEsnzSTK11gzbP5SG_cgLCje5saWyO-A';
+        const apiKey = 'AIzaSyAmlThKq4RMPAbU7lZKwe34vWnyNkn_GrY';
         const channelIds = [
             'UCfEbx5pXwoQuj-Y2M6zsDfw',
             'UCAeLLSfvJ-PnTja6cWQtZzA',
@@ -20,39 +20,45 @@
             'UCV_iUJtaJA62vnM9hM_opRw'
         ];
 
-        function fetchLatestVideo(channelId) {
+        function fetchUploadsPlaylistId(channelId) {
             return $.ajax({
-                url: `https://www.googleapis.com/youtube/v3/search?key=${apiKey}&channelId=${channelId}&part=snippet,id&order=date&maxResults=1`,
+                url: `https://www.googleapis.com/youtube/v3/channels?key=${apiKey}&id=${channelId}&part=contentDetails`,
                 dataType: 'json'
             });
         }
 
-       function displayVideoList(videos) {
-			const $videoList = $('#videoList');
-			$videoList.empty();
-
-			videos.forEach((video, index) => {
-				const videoUrl = `https://youtu.be/${video.id.videoId}`;
-				const videoTitleArray = [
-					'活潑的生命',
-					'心靈蜜豆奶',
-					'恩典365',
-					'陪你讀聖經'
-				];
-
-				const videoTitle = videoTitleArray[index];
-				const videoSubtitle = video.snippet.title;
-				$videoList.append(`<li>${videoTitle}：<br>${videoSubtitle}<br><a href="${videoUrl}" target="_blank">${videoUrl}</a></li>`);
-			});
-		}
-
-
-        function fetchAndDisplayLatestVideos() {
-            const requests = channelIds.map(fetchLatestVideo);
-            $.when(...requests).then((...responses) => {
-                const videos = responses.map(response => response[0].items[0]);
-                displayVideoList(videos);
+        function fetchLatestVideo(uploadsPlaylistId) {
+            return $.ajax({
+                url: `https://www.googleapis.com/youtube/v3/playlistItems?key=${apiKey}&playlistId=${uploadsPlaylistId}&part=snippet&maxResults=1`,
+                dataType: 'json'
             });
+        }
+
+        function displayVideoList(videos) {
+            const $videoList = $('#videoList');
+            $videoList.empty();
+
+            videos.forEach((video, index) => {
+                const videoUrl = `https://youtu.be/${video.snippet.resourceId.videoId}`;
+                const videoTitleArray = [
+                    '活潑的生命',
+                    '心靈蜜豆奶',
+                    '恩典365',
+                    '陪你讀聖經'
+                ];
+
+                const videoTitle = videoTitleArray[index];
+                const videoSubtitle = video.snippet.title;
+                $videoList.append(`<li>${videoTitle}：<br>${videoSubtitle}<br><a href="${videoUrl}" target="_blank">${videoUrl}</a></li>`);
+            });
+        }
+
+        async function fetchAndDisplayLatestVideos() {
+            const playlistRequests = await Promise.all(channelIds.map(fetchUploadsPlaylistId));
+            const uploadsPlaylistIds = playlistRequests.map(response => response.items[0].contentDetails.relatedPlaylists.uploads);
+            const videoRequests = await Promise.all(uploadsPlaylistIds.map(fetchLatestVideo));
+            const videos = videoRequests.map(response => response.items[0]);
+            displayVideoList(videos);
         }
 
         $(document).ready(fetchAndDisplayLatestVideos);
