@@ -69,8 +69,8 @@
             const listItems = $('#videoList li');
             let textToCopy = '';
             listItems.each(function() {
-                textToCopy += $(this).text() + '\n';
-            });        
+                textToCopy += $(this).html().replace(/<br>/g, '\n') + '\n';
+            });    
             const $tempInput = $('<textarea>');
             $('body').append($tempInput);
             $tempInput.val(textToCopy).select();
