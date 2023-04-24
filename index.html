@@ -43,6 +43,18 @@
             $copyList.empty();
             videos.forEach((video, index) => {
                 const videoUrl = `https://youtu.be/${video.snippet.resourceId.videoId}`;
+                const vndYt = `vnd.youtube://${video.snippet.resourceId.videoId}`;
+                var finalYt = ``;
+                // 檢查是否為移動設備
+                const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+                if (isMobile) {
+                    // 使用內建 YouTube 應用程式打開視頻
+                    finalYt = vndYt;
+                } else {
+                    // 在瀏覽器中打開視頻
+                    finalYt = videoUrl;
+                }
                 const videoTitleArray = [
                     '活潑的生命',
                     '心靈蜜豆奶',
@@ -52,8 +64,10 @@
 
                 const videoTitle = videoTitleArray[index];
                 const videoSubtitle = video.snippet.title;
-                $videoList.append(`<li>${videoTitle}：<br>${videoSubtitle}<br><a href="${videoUrl}" target="_blank">${videoUrl}</a></li>`);
-                $copyList.append(`\n${videoTitle}：\n${videoSubtitle}\n${videoUrl}\n`);
+                $videoList.append(`<li>${videoTitle}：<br>${videoSubtitle}<br><a href="${finalYt}" target="_blank">${videoUrl}</a></li>`);
+                $copyList.append(`${videoTitle}：\n${videoUrl}`);
+                if(index < 3)
+                    $copyList.append(`\n`);
             });
         }
 
