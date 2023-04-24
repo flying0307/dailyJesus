@@ -12,6 +12,7 @@
     <h1>每日靈糧最新影片</h1>
     <button id="copyButton">複製所有影片連結</button>
     <ul id="videoList"></ul>
+    <div id="copyList" hidden='true'></hide>
     <script>
         const apiKey = 'AIzaSyAmlThKq4RMPAbU7lZKwe34vWnyNkn_GrY';
         const channelIds = [
@@ -38,7 +39,8 @@
         function displayVideoList(videos) {
             const $videoList = $('#videoList');
             $videoList.empty();
-
+            const $copyList = $('#copyList');
+            $copyList.empty();
             videos.forEach((video, index) => {
                 const videoUrl = `https://youtu.be/${video.snippet.resourceId.videoId}`;
                 const videoTitleArray = [
@@ -51,6 +53,7 @@
                 const videoTitle = videoTitleArray[index];
                 const videoSubtitle = video.snippet.title;
                 $videoList.append(`<li>${videoTitle}：<br>${videoSubtitle}<br><a href="${videoUrl}" target="_blank">${videoUrl}</a></li>`);
+                $copyList.append(`\n${videoTitle}：\n${videoSubtitle}\n${videoUrl}\n`);
             });
         }
 
@@ -66,11 +69,8 @@
 
         // 新增的複製按鈕功能
         $('#copyButton').click(function() {
-            const listItems = $('#videoList li');
-            let textToCopy = '';
-            listItems.each(function() {
-                textToCopy += $(this).html().replace(/<br>/g, '\n') + '\n';
-            });    
+            let textToCopy = $('#copyList').text();
+            
             const $tempInput = $('<textarea>');
             $('body').append($tempInput);
             $tempInput.val(textToCopy).select();
