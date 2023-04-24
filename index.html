@@ -10,6 +10,7 @@
 
 <body>
     <h1>每日靈糧最新影片</h1>
+    <button id="copyButton">複製所有影片連結</button>
     <ul id="videoList"></ul>
     <script>
         const apiKey = 'AIzaSyAmlThKq4RMPAbU7lZKwe34vWnyNkn_GrY';
@@ -62,6 +63,24 @@
         }
 
         $(document).ready(fetchAndDisplayLatestVideos);
+
+        // 新增的複製按鈕功能
+        $('#copyButton').click(function() {
+            const listItems = $('#videoList li');
+            let textToCopy = '';
+            listItems.each(function() {
+                textToCopy += $(this).text() + '\n';
+            });        
+            const $tempInput = $('<textarea>');
+            $('body').append($tempInput);
+            $tempInput.val(textToCopy).select();
+            document.execCommand('copy');
+            $tempInput.remove();
+            alert('已複製所有影片連結');
+        }
+    );
+</script>
+
     </script>
 </body>
 
