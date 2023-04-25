@@ -62,7 +62,7 @@
                 var finalYt = ``;
                 // 檢查是否為移動設備
                 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
-
+                var hidden = !isMobile? 'hidden':''; 
                 const videoTitleArray = [
                     '活潑的生命',
                     '心靈蜜豆奶',
@@ -72,7 +72,7 @@
                 
                 const videoTitle = videoTitleArray[index];
                 const videoSubtitle = video.snippet.title;
-                $videoList.append(`<li>${videoTitle}：<br>${videoSubtitle}<br><div class="link-container"><a href="${videoUrl}?autoplay=1" target="_blank">${videoUrl}</a><span class="yt-icon" data-video-id="${videoId}" hidden=${isMobile}>open_in_new</span></div></li>`);
+                $videoList.append(`<li>${videoTitle}：<br>${videoSubtitle}<br><div class="link-container"><a href="${videoUrl}?autoplay=1" target="_blank">${videoUrl}</a><span class="yt-icon" data-video-id="${videoId}" ${hidden}>open_in_new</span></div></li>`);
                 $copyList.append(`${videoTitle}：\n${videoUrl}`);
                 if(index < 3)
                     $copyList.append(`\n`);
