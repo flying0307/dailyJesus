@@ -28,6 +28,12 @@
     <ul id="videoList"></ul>
     <div id="copyList" hidden='true'></hide>
     <script>
+        const videoTitleArray = [
+                    '活潑的生命',
+                    '心靈蜜豆奶',
+                    '恩典365',
+                    '陪你讀聖經'
+                ];
         const apiKey = 'AIzaSyAmlThKq4RMPAbU7lZKwe34vWnyNkn_GrY';
         const channelIds = [
             'UCfEbx5pXwoQuj-Y2M6zsDfw',
@@ -45,7 +51,7 @@
 
         function fetchLatestVideo(uploadsPlaylistId) {
             return $.ajax({
-                url: `https://www.googleapis.com/youtube/v3/playlistItems?key=${apiKey}&playlistId=${uploadsPlaylistId}&part=snippet&maxResults=1`,
+                url: `https://www.googleapis.com/youtube/v3/playlistItems?key=${apiKey}&playlistId=${uploadsPlaylistId}&part=snippet&maxResults=3`,
                 dataType: 'json'
             });
         }
@@ -63,12 +69,7 @@
                 // 檢查是否為移動設備
                 const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
                 var hidden = !isMobile? 'hidden':''; 
-                const videoTitleArray = [
-                    '活潑的生命',
-                    '心靈蜜豆奶',
-                    '恩典365',
-                    '陪你讀聖經'
-                ];
+                
                 
                 const videoTitle = videoTitleArray[index];
                 const videoSubtitle = video.snippet.title;
@@ -78,12 +79,33 @@
                     $copyList.append(`\n`);
             });
         }
+        
+        function checkTitle(item){
+            let find = false;
+            videoTitleArray.some((value, index) =>{
+                if(item.snippet.title.includes(value))
+                {
+                    find = true;
+                    return true;
+                }
+            })
+            return find;
+        }
 
         async function fetchAndDisplayLatestVideos() {
             const playlistRequests = await Promise.all(channelIds.map(fetchUploadsPlaylistId));
             const uploadsPlaylistIds = playlistRequests.map(response => response.items[0].contentDetails.relatedPlaylists.uploads);
             const videoRequests = await Promise.all(uploadsPlaylistIds.map(fetchLatestVideo));
-            const videos = videoRequests.map(response => response.items[0]);
+            const videos = videoRequests.map(response => {
+                let result = response.items[0];
+                if(!checkTitle(result)){
+                    result = response.items[1];
+                    if(!checkTitle(result)){
+                        result = response.items[2];
+                    }
+                }
+                return result
+            });
             displayVideoList(videos);
             
             $('.yt-icon').on('click', function () {
